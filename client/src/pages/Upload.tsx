@@ -36,7 +36,20 @@ export default function Upload() {
     tags: "",
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [shippingDetails, setShippingDetails] = useState({
+    fullName: "",
+    address1: "",
+    address2: "",
+    city: "",
+    state: "",
+    zip: "",
+    country: "United States",
+  });
   const [isPaymentDialogOpen, setIsPaymentDialogOpen] = useState(false);
+
+  // In a real application, you would get the authenticated user 
+  // from a context or a hook, e.g., const { user } = useAuth();
+  const mockUser = { id: "user_abc_123", email: "customer@example.com" };
 
   const handleDrag = useCallback((e: React.DragEvent) => {
     e.preventDefault();
@@ -96,22 +109,58 @@ export default function Upload() {
   };
 
   const handlePaymentAndSubmit = async () => {
+    if (!uploadedFile) return; // Should not happen, but good practice
+
     setIsSubmitting(true);
-    setIsPaymentDialogOpen(false);
-    
-    // Simulate API call for payment and upload
-    await new Promise((resolve) => setTimeout(resolve, 2000));
-    
-    toast({
-      title: "Success!",
-      description: "Your payment was successful and your custom design request has been submitted.",
-    });
-    
-    setIsSubmitting(false);
-    // Reset form
-    setUploadedFile(null);
-    setPreview(null);
-    setFormData({ name: "", description: "", category: "", tags: "" });
+
+    // 1. Create a FormData object to send multipart data (including the file)
+    const submissionData = new FormData();
+    submissionData.append("image", uploadedFile);
+    submissionData.append("userId", mockUser.id);
+    submissionData.append("designDetails", JSON.stringify(formData));
+    submissionData.append("shippingDetails", JSON.stringify(shippingDetails));
+    // In a real scenario, you'd append a payment token from your payment provider
+    // submissionData.append("paymentToken", "tok_123xyz");
+
+    try {
+      // 2. Simulate sending the data to a backend endpoint
+      console.log("Submitting order to backend...", Object.fromEntries(submissionData.entries()));
+      // const response = await fetch('/api/orders', {
+      //   method: 'POST',
+      //   body: submissionData,
+      // });
+      // if (!response.ok) {
+      //   throw new Error('Network response was not ok');
+      // }
+      // const result = await response.json();
+      // console.log("Backend response:", result);
+      
+      // --- MOCK API CALL ---
+      await new Promise(resolve => setTimeout(resolve, 2000));
+      // --- END MOCK ---
+
+      // 3. On success, show toast and reset the form
+      toast({
+        title: "Order Submitted!",
+        description: "Your custom design request has been received and will appear in your order history.",
+      });
+
+      setIsPaymentDialogOpen(false);
+      setUploadedFile(null);
+      setPreview(null);
+      setFormData({ name: "", description: "", category: "", tags: "" });
+      setShippingDetails({ fullName: "", address1: "", address2: "", city: "", state: "", zip: "", country: "United States" });
+
+    } catch (error) {
+      console.error("Failed to submit order:", error);
+      toast({
+        title: "Submission Failed",
+        description: "There was a problem submitting your order. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -331,36 +380,85 @@ export default function Upload() {
       <Dialog open={isPaymentDialogOpen} onOpenChange={setIsPaymentDialogOpen}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Confirm Your Order</DialogTitle>
+            <DialogTitle>Complete Your Order</DialogTitle>
             <DialogDescription>
-              You are about to pay a standard fee for your custom design request.
+              Please provide your shipping and payment details to submit your custom design.
             </DialogDescription>
           </DialogHeader>
-          <div className="py-6">
-            <div className="flex justify-between items-center bg-muted p-4 rounded-lg">
-              <span className="font-medium">Custom Design Fee</span>
-              <span className="text-2xl font-bold">$50.00</span>
+          <form onSubmit={(e) => { e.preventDefault(); handlePaymentAndSubmit(); }}>
+            <div className="py-6 space-y-6">
+              {/* Shipping Details */}
+              <div className="space-y-4">
+                <h3 className="text-lg font-semibold">Shipping Address</h3>
+                <div className="space-y-2">
+                  <Label htmlFor="fullName">Full Name</Label>
+                  <Input id="fullName" value={shippingDetails.fullName} onChange={(e) => setShippingDetails({...shippingDetails, fullName: e.target.value})} required />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="address1">Address Line 1</Label>
+                  <Input id="address1" value={shippingDetails.address1} onChange={(e) => setShippingDetails({...shippingDetails, address1: e.target.value})} required />
+                </div>
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
+                  <div className="space-y-2">
+                    <Label htmlFor="city">City</Label>
+                    <Input id="city" value={shippingDetails.city} onChange={(e) => setShippingDetails({...shippingDetails, city: e.target.value})} required />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="state">State</Label>
+                    <Input id="state" value={shippingDetails.state} onChange={(e) => setShippingDetails({...shippingDetails, state: e.target.value})} required />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="zip">ZIP Code</Label>
+                    <Input id="zip" value={shippingDetails.zip} onChange={(e) => setShippingDetails({...shippingDetails, zip: e.target.value})} required />
+                  </div>
+                </div>
+              </div>
+
+              {/* Payment Details */}
+              <div className="space-y-4">
+                <h3 className="text-lg font-semibold">Payment Details</h3>
+                {/* 
+                  IMPORTANT: For PCI compliance, you should use a payment provider's 
+                  component here (e.g., Stripe's <CardElement />) instead of raw input fields.
+                  This is a placeholder to illustrate the UI.
+                */}
+                <div className="p-4 border rounded-lg bg-muted">
+                  <Label>Card Information</Label>
+                  <div className="mt-2 h-10 w-full bg-background rounded-md flex items-center px-3 text-sm text-muted-foreground">
+                    {/* This is where Stripe's CardElement would be mounted */}
+                    Card details input from payment provider
+                  </div>
+                </div>
+              </div>
+
+              {/* Order Summary */}
+              <div>
+                <h3 className="text-lg font-semibold mb-2">Order Summary</h3>
+                <div className="flex justify-between items-center bg-muted p-4 rounded-lg">
+                  <span className="font-medium">Custom Design Fee</span>
+                  <span className="text-2xl font-bold">$50.00</span>
+                </div>
+                <p className="text-xs text-muted-foreground mt-2">
+                  This is a one-time fee for our team to process and prepare your design for production.
+                </p>
+              </div>
             </div>
-            <p className="text-xs text-muted-foreground mt-2">
-              This is a one-time fee for our team to process and prepare your design for production.
-            </p>
-          </div>
-          <Button
-            type="button"
-            size="lg"
-            className="w-full"
-            onClick={handlePaymentAndSubmit}
-            disabled={isSubmitting}
-          >
-            {isSubmitting ? (
-              <>
-                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                Processing Payment...
-              </>
-            ) : (
-              "Pay Now & Submit Design"
-            )}
-          </Button>
+            <Button
+              type="submit"
+              size="lg"
+              className="w-full"
+              disabled={isSubmitting}
+            >
+              {isSubmitting ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Processing Payment...
+                </>
+              ) : (
+                "Pay Now & Submit Design"
+              )}
+            </Button>
+          </form>
         </DialogContent>
       </Dialog>
     </Layout>

@@ -73,3 +73,15 @@ export const getUsers = async (token: string): Promise<UsersResponse> => {
   });
   return res.json();
 };
+
+
+export const getStats = async (token: string) => {
+  try {
+    const res = await fetch(`${API_URL}/stats`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    return res.json();
+  } catch (err: any) {
+    return { success: false, message: err.response?.data?.message || err.message };
+  }
+};

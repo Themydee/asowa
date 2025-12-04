@@ -15,6 +15,7 @@
   import { Checkbox } from "@/components/ui/checkbox";
   import { loginUser } from "@/services/api";
   import { useNavigate } from "react-router-dom";
+import { useAuth } from "@/context/AuthContext";
 
 
   type LoginResponse = {
@@ -35,6 +36,7 @@
     const [password, setPassword] = useState("");
     const [error, setError] = useState<string | null>(null);
     const navigate = useNavigate();
+    const { login } = useAuth();
 
     const handleSubmit = async (e: React.FormEvent) => {
       e.preventDefault();
@@ -47,8 +49,7 @@
           return;
         }
 
-        localStorage.setItem("token", res.token);
-        localStorage.setItem("user", JSON.stringify(res.user));
+         login({ ...res.user, id: Number(res.user.id), fullname: String(res.user.fullname), email: String(res.user.email) }, res.token); 
 
       
         if (res.user.role.toLowerCase() === "admin") {
@@ -74,13 +75,9 @@
           >
             {/* Logo */}
             <Link to="/" className="flex items-center space-x-2 mb-8">
-              <div className="w-10 h-10 rounded-lg bg-primary flex items-center justify-center">
-                <span className="text-primary-foreground font-bold text-xl">
-                  T
-                </span>
-              </div>
+              
               <span className="font-bold text-xl text-foreground">
-                TextileHub
+                A'sowa
               </span>
             </Link>
 

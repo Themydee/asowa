@@ -102,10 +102,8 @@ export default function Register() {
         >
           {/* Logo */}
           <Link to="/" className="flex items-center space-x-2 mb-8">
-            <div className="w-10 h-10 rounded-lg bg-primary flex items-center justify-center">
-              <span className="text-primary-foreground font-bold text-xl">T</span>
-            </div>
-            <span className="font-bold text-xl text-foreground">TextileHub</span>
+            
+            <span className="font-bold text-xl text-foreground">A'sowa</span>
           </Link>
 
           <Card variant="elevated" className="border-0">

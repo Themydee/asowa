@@ -35,12 +35,6 @@ export function HeroSection() {
             </p>
             
             <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
-              <Link to="/designs">
-                <Button variant="hero" size="xl">
-                  Browse Designs
-                  <ArrowRight className="h-5 w-5" />
-                </Button>
-              </Link>
               <Link to="/upload">
                 <Button variant="hero-outline" size="xl">
                   Upload Your Design

@@ -131,7 +131,7 @@ export default function AdminDashboard() {
             </div>
 
             {/* Stats */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+            {/* <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
               {adminStats.map((stat, index) => (
                 <motion.div
                   key={stat.label}
@@ -162,7 +162,7 @@ export default function AdminDashboard() {
                   </Card>
                 </motion.div>
               ))}
-            </div>
+            </div> */}
 
             {/* Content Tabs */}
             <Tabs value={activeTab} onValueChange={setActiveTab}>
