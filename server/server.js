@@ -7,6 +7,8 @@ import path from "path"
 import authRoute from "./routes/authRoute.js"
 import designRoute from "./routes/designRoute.js"
 import userRoute from "./routes/userRoute.js"
+import statRoute from "./routes/statRoute.js"
+
 
 
 
@@ -25,6 +27,7 @@ app.get("/", (req, res) => {
 app.use("/api/auth", authRoute);
 app.use("/api/designs", designRoute);
 app.use("/api/users", userRoute);
+app.use("/api/stats", statRoute);
 
 app.use("/uploads", express.static(path.join(process.cwd(), "uploads")));
 
